@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SpendWise">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>SpendWise</title>
+  <style>
+/* ==========================================================
+   SpendWise – styles.css
+   1. Design tokens   2. Base   3. Layout   4. Navigation
+   5. Shared components (cards, buttons, forms, toast, empty state)
+   6. Temporary developer tools (optional developer tool)
+   ========================================================== */
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  --primary: #2563EB;
+  --navy: #102A56;
+  --light-blue: #60A5FA;
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --text: #172554;
+
+  --muted: #64748B;
+  --line: #E2E8F0;
+  --tint: #EFF6FF;          /* very light blue for soft fills */
+  --income: #1D4ED8;        /* money in (blue, no green) */
+  --expense: #E11D48;       /* semantic only: money out */
+  --warn: #D97706;
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(16, 42, 86, .06), 0 6px 20px rgba(16, 42, 86, .07);
+
+  --nav-h: 68px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+/* ---------- 2. Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3, p { margin: 0; }
+h2 { font-size: 1.125rem; letter-spacing: -0.01em; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+svg { width: 24px; height: 24px; flex-shrink: 0; }
+
+:focus-visible { outline: 3px solid var(--light-blue); outline-offset: 2px; }
+
+/* ---------- 3. Layout ---------- */
+.app {
+  max-width: 480px;            /* keeps a phone-shaped column on big screens */
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+}
+
+.topbar {
+  padding: calc(var(--safe-top) + 20px) 20px 8px;
+}
+.topbar-sub { color: var(--muted); font-size: .875rem; }
+.topbar-title {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 750;
+  color: var(--navy);
+}
+
+.views {
+  padding: 12px 16px calc(var(--nav-h) + var(--safe-bottom) + 24px);
+}
+
+.view[hidden] { display: none; }
+
+/* A short fade when you switch screens – a reaction to your tap, nothing more */
+.view.is-entering { animation: view-in .18s ease-out; }
+@keyframes view-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- 4. Bottom navigation ---------- */
+.bottom-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding: 0 8px var(--safe-bottom);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -4px 20px rgba(16, 42, 86, .06);
+  z-index: 10;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .6875rem;
+  font-weight: 600;
+  transition: color .15s;
+}
+.nav-item[aria-current="page"] { color: var(--primary); }
+
+/* Centre "Add" button stands out as the main action */
+.nav-add-circle {
+  display: grid;
+  place-items: center;
+  width: 52px; height: 52px;
+  margin-top: -26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  border: 4px solid var(--bg);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, .4);
+  transition: transform .15s, background .15s;
+}
+.nav-add:active .nav-add-circle { transform: scale(.94); }
+.nav-add[aria-current="page"] .nav-add-circle { background: var(--navy); }
+.nav-add[aria-current="page"] { color: var(--navy); }
+
+/* ---------- 5. Shared components ---------- */
+.card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.empty-state {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 36px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.empty-state p { color: var(--muted); font-size: .9375rem; max-width: 30ch; }
+.empty-icon {
+  display: grid; place-items: center;
+  width: 64px; height: 64px;
+  border-radius: 20px;
+  background: var(--tint);
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.empty-icon svg { width: 30px; height: 30px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform .1s, background .15s;
+}
+.btn:active { transform: scale(.98); }
+.btn-secondary { background: var(--tint); color: var(--primary); }
+.btn-danger { background: #FFF1F2; color: var(--expense); }
+.btn-block { width: 100%; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field label { font-size: .875rem; font-weight: 600; }
+.field input, .field select, .field textarea {
+  min-height: 48px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, .35);
+}
+.field .error { color: var(--expense); font-size: .8125rem; min-height: 1em; }
+
+.progress { height: 10px; background: var(--tint); border-radius: 99px; overflow: hidden; }
+.progress > span { display: block; height: 100%; width: 0; background: var(--primary); border-radius: 99px; transition: width .4s ease; }
+.progress.is-warn > span { background: var(--warn); }
+.progress.is-over > span { background: var(--expense); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 24px);
+  transform: translate(-50%, 20px);
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 12px 18px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: .9375rem;
+  box-shadow: 0 10px 30px rgba(16, 42, 86, .3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 50;
+}
+.toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+.toast.is-error { background: var(--expense); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- 6. Temporary developer tools (optional developer tool) ---------- */
+.dev-card { margin-top: 16px; }
+.dev-note { color: var(--muted); font-size: .875rem; margin: 4px 0 14px; }
+.dev-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dev-actions .btn { padding: 0 10px; font-size: .9375rem; }
+.dev-log {
+  margin: 14px 0 0;
+  padding: 12px;
+  background: var(--navy);
+  color: #DBEAFE;
+  border-radius: var(--radius-md);
+  font: .8125rem/1.5 ui-monospace, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 80px;
+}
+
+
+/* ---------- 7. Screens: Home, History, Add, Analytics, Profile ---------- */
+.stack > * + * { margin-top: 14px; }
+.muted { color: var(--muted); }
+a.btn { text-decoration: none; }
+.empty-state .btn { margin-top: 8px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat .label { font-size: .8125rem; color: var(--muted); }
+.stat .val { font-size: 1.2rem; font-weight: 750; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.stat .val.in { color: var(--income); }
+.stat .val.out { color: var(--expense); }
+.hero { background: linear-gradient(135deg, var(--navy), var(--primary)); color: #fff; border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow); }
+.hero .label { opacity: .8; font-size: .875rem; }
+.hero .val { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.card-head a { color: var(--primary); font-weight: 650; text-decoration: none; font-size: .9rem; }
+.alert { padding: 10px 12px; border-radius: 12px; font-size: .875rem; margin-top: 10px; background: var(--tint); color: var(--navy); }
+.alert.warn { background: #FEF3C7; color: #92400E; }
+.alert.over { background: #FFE4E6; color: #9F1239; }
+.bar-row { margin: 12px 0; }
+.bar-head { display: flex; justify-content: space-between; gap: 8px; font-size: .875rem; }
+.bar { height: 10px; background: var(--tint); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+.bar > span { display: block; height: 100%; border-radius: 99px; background: var(--primary); }
+.bar.in > span { background: var(--light-blue); }
+.bar.out > span { background: var(--navy); }
+.tx { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.tx:last-child { border-bottom: 0; }
+.tx-ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; flex-shrink: 0; }
+.tx-ico.in { background: #DBEAFE; color: var(--primary); }
+.tx-ico.out { background: var(--navy); color: #fff; }
+.tx-main { flex: 1; min-width: 0; }
+.tx-title { font-weight: 650; overflow-wrap: anywhere; }
+.tx-meta, .tx-note { color: var(--muted); font-size: .8125rem; overflow-wrap: anywhere; }
+.tx-amt { font-weight: 700; white-space: nowrap; }
+.tx-amt.in { color: var(--income); }
+.tx-amt.out { color: var(--expense); }
+.tx-actions { margin-top: 2px; }
+.link { background: none; border: 0; color: var(--primary); font-weight: 650; padding: 8px 14px 8px 0; min-height: 40px; cursor: pointer; }
+.link.danger { color: var(--expense); }
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+.filters .field { margin: 0; }
+.filters .full { grid-column: 1 / -1; }
+.count { font-size: .8125rem; color: var(--muted); margin: 6px 4px 10px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--tint); border-radius: var(--radius-md); padding: 4px; margin-bottom: 6px; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; }
+.seg span { display: block; text-align: center; padding: 12px; border-radius: 10px; font-weight: 650; color: var(--muted); }
+.seg input:checked + span { background: var(--primary); color: #fff; }
+.seg input:focus-visible + span { outline: 3px solid var(--light-blue); }
+.seg-error { margin-bottom: 10px; }
+.daily { display: flex; align-items: flex-end; gap: 2px; height: 110px; }
+.daily i { flex: 1; background: var(--light-blue); border-radius: 3px 3px 0 0; min-height: 2px; }
+.daily i.hi { background: var(--navy); }
+.axis { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin-top: 6px; }
+.months { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.pair { display: flex; align-items: flex-end; justify-content: center; gap: 3px; height: 120px; }
+.pair i { width: 40%; max-width: 16px; border-radius: 3px 3px 0 0; min-height: 2px; }
+.pair i.in { background: var(--light-blue); }
+.pair i.out { background: var(--navy); }
+.months .lbl { text-align: center; font-size: .75rem; color: var(--muted); margin-top: 6px; }
+.legend { font-size: .8125rem; color: var(--muted); margin-top: 10px; }
+.legend b { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin: 0 4px 0 0; vertical-align: -1px; }
+.btn-row { display: grid; gap: 10px; margin-top: 12px; }
+.inline-field { display: flex; gap: 10px; align-items: flex-start; }
+.inline-field .field { flex: 1; margin: 0; }
+.modal { position: fixed; inset: 0; background: rgba(16, 42, 86, .5); display: grid; place-items: center; padding: 20px; z-index: 100; }
+.modal[hidden] { display: none; }
+.modal-box { background: #fff; border-radius: var(--radius-lg); padding: 22px; max-width: 360px; width: 100%; }
+.modal-box p { color: var(--muted); margin-top: 6px; overflow-wrap: anywhere; }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+summary { cursor: pointer; font-weight: 650; }
+  </style>
+</head>
+<body>
+
+  <!-- Icon library: every icon in the app is defined once here and reused with <use href="#i-name"> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+      <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+      <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1" fill="currentColor"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="app">
+
+    <header class="topbar">
+      <p class="topbar-sub" id="topbar-sub"></p>
+      <h1 class="topbar-title" id="topbar-title">SpendWise</h1>
+    </header>
+
+    <main class="views" id="views">
+
+      <section class="view" id="view-home" data-title="Home" data-sub="Your money at a glance" hidden>
+        <div class="stack" id="home-body"></div>
+      </section>
+
+      <section class="view" id="view-history" data-title="History" data-sub="Every transaction, newest first" hidden>
+        <div class="card filters">
+          <div class="field full"><label for="f-search">Search by title</label><input id="f-search" type="search" placeholder="Search transactions" autocomplete="off"></div>
+          <div class="field"><label for="f-type">Type</label><select id="f-type"><option value="">All types</option><option value="income">Income</option><option value="expense">Expense</option></select></div>
+          <div class="field"><label for="f-cat">Category</label><select id="f-cat"></select></div>
+          <div class="field"><label for="f-from">From date</label><input id="f-from" type="date"></div>
+          <div class="field"><label for="f-to">To date</label><input id="f-to" type="date"></div>
+          <button type="button" class="btn btn-secondary full" id="f-clear">Clear filters</button>
+        </div>
+        <p class="count" id="history-count"></p>
+        <div id="history-list"></div>
+      </section>
+
+      <section class="view" id="view-add" data-title="Add transaction" data-sub="Record income or an expense" hidden>
+        <form class="card" id="tx-form" novalidate>
+          <div class="seg" role="group" aria-label="Transaction type">
+            <label><input type="radio" name="type" value="expense" checked><span>Expense</span></label>
+            <label><input type="radio" name="type" value="income"><span>Income</span></label>
+          </div>
+          <div class="field error seg-error" id="e-type"></div>
+          <div class="field"><label for="a-title">Title</label><input id="a-title" maxlength="60" autocomplete="off" placeholder="e.g. Lunch at canteen"><div class="error" id="e-title"></div></div>
+          <div class="field"><label for="a-amount">Amount (₹)</label><input id="a-amount" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="0.00"><div class="error" id="e-amount"></div></div>
+          <div class="field"><label for="a-category">Category</label><select id="a-category"></select><div class="error" id="e-category"></div></div>
+          <div class="field"><label for="a-date">Date</label><input id="a-date" type="date"><div class="error" id="e-date"></div></div>
+          <div class="field"><label for="a-method">Payment method</label>
+            <select id="a-method"><option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option><option>Other</option></select>
+            <div class="error" id="e-paymentMethod"></div></div>
+          <div class="field"><label for="a-note">Note (optional)</label><textarea id="a-note" rows="2" maxlength="200" placeholder="Anything to remember?"></textarea><div class="error" id="e-note"></div></div>
+          <button class="btn btn-block" type="submit" id="a-submit">Save transaction</button>
+          <button class="btn btn-secondary btn-block" type="button" id="a-cancel" hidden style="margin-top:10px">Cancel editing</button>
+        </form>
+      </section>
+
+      <section class="view" id="view-analytics" data-title="Analytics" data-sub="Where your money goes" hidden>
+        <div class="card"><div class="field" style="margin:0"><label for="an-month">Month</label><input id="an-month" type="month"></div></div>
+        <div class="stack" id="analytics-body" style="margin-top:14px"></div>
+      </section>
+
+      <section class="view" id="view-settings" data-title="Profile & settings" data-sub="Budget, categories and your data" hidden>
+        <div class="stack">
+          <div class="card">
+            <h2>Monthly budget</h2>
+            <div class="inline-field" style="margin-top:12px">
+              <div class="field"><label for="b-input">Budget amount (₹)</label><input id="b-input" type="number" inputmode="decimal" step="0.01" min="0" placeholder="e.g. 10000"><div class="error" id="b-error"></div></div>
+              <button class="btn" type="button" id="b-save" style="margin-top:26px">Save</button>
+            </div>
+            <div id="budget-status"></div>
+          </div>
+          <div class="card">
+            <h2>Your data</h2>
+            <p class="muted" id="d-count" style="margin-top:4px"></p>
+            <div class="btn-row">
+              <button class="btn" type="button" id="btn-csv">Export transactions (CSV)</button>
+              <button class="btn btn-secondary" type="button" id="btn-backup">Backup data (JSON)</button>
+              <button class="btn btn-secondary" type="button" id="btn-restore">Restore from backup</button>
+              <input type="file" id="file-restore" accept="application/json,.json" hidden>
+              <button class="btn btn-secondary" type="button" id="btn-sample">Load sample data</button>
+              <button class="btn btn-secondary" type="button" id="btn-unsample" hidden>Remove sample data</button>
+              <button class="btn btn-danger" type="button" id="btn-clear">Clear all data</button>
+            </div>
+          </div>
+          <details class="card dev-card">
+            <summary>Developer tools: database self-test</summary>
+            <p class="dev-note" style="margin-top:10px">Checks that saving, reading, updating and deleting work. Only items titled "Stage 2 test" are ever touched.</p>
+            <div class="dev-actions">
+              <button type="button" class="btn" id="dbtest-run">Run self-test</button>
+              <button type="button" class="btn btn-secondary" id="dbtest-add">Add test item</button>
+              <button type="button" class="btn btn-secondary" id="dbtest-show">Show stored</button>
+              <button type="button" class="btn btn-danger" id="dbtest-remove">Remove test items</button>
+            </div>
+            <pre class="dev-log" id="dbtest-log" aria-live="polite">Tap a button to begin.</pre>
+          </details>
+        </div>
+      </section>
+
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <a href="#home" data-route="home" class="nav-item">
+        <svg><use href="#i-home"/></svg><span>Home</span>
+      </a>
+      <a href="#history" data-route="history" class="nav-item">
+        <svg><use href="#i-history"/></svg><span>History</span>
+      </a>
+      <a href="#add" data-route="add" class="nav-item nav-add" aria-label="Add transaction">
+        <span class="nav-add-circle"><svg><use href="#i-plus"/></svg></span>
+        <span>Add</span>
+      </a>
+      <a href="#analytics" data-route="analytics" class="nav-item">
+        <svg><use href="#i-chart"/></svg><span>Analytics</span>
+      </a>
+      <a href="#settings" data-route="settings" class="nav-item">
+        <svg><use href="#i-user"/></svg><span>Profile</span>
+      </a>
+    </nav>
+
+    <div class="modal" id="modal" hidden>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="m-title">
+        <h2 id="m-title"></h2>
+        <p id="m-msg"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="m-cancel">Cancel</button>
+          <button type="button" class="btn btn-danger" id="m-ok">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <!-- JAVASCRIPT: five parts, loaded in this order. Later stages add more parts. -->
+  <!-- PART 1 of 5 - utils.js: small helper functions -->
+  <script>
+/* ==========================================================
+   SpendWise – utils.js
+   Small helper functions shared by the whole app.
+   Dates are always stored as text in the form "YYYY-MM-DD"
+   (for example "2026-10-31") using the phone's LOCAL date.
+   This avoids time-zone bugs around midnight.
+   ========================================================== */
+(function () {
+  'use strict';
+
+  const SpendWise = (window.SpendWise = window.SpendWise || {});
+  const utils = (SpendWise.utils = {});
+
+  // 5 -> "05"
+  function pad(number) {
+    return String(number).padStart(2, '0');
+  }
+
+  // Today's date on this phone, e.g. "2026-10-31"
+  utils.todayISO = function () {
+    const now = new Date();
+    return now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+  };
+
+  // True only for real calendar dates. "2026-02-30" is rejected.
+  utils.isValidDateISO = function (text) {
+    if (typeof text !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(text)) return false;
+    const parts = text.split('-').map(Number);
+    const check = new Date(parts[0], parts[1] - 1, parts[2]);
+    return (
+      check.getFullYear() === parts[0] &&
+      check.getMonth() === parts[1] - 1 &&
+      check.getDate() === parts[2]
+    );
+  };
+
+  // Rounds to 2 decimals so 0.1 + 0.2 never shows as 0.30000000000000004
+  utils.roundMoney = function (value) {
+    return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+  };
+})();
+  </script>
+
+  <!-- PART 2 of 5 - db.js: the IndexedDB data layer -->
+  <script>
+/* ==========================================================
+   SpendWise – db.js
+   The data layer. This is the ONLY file that talks to IndexedDB.
+   Other files call the functions below, for example:
+
+     SpendWise.db.addTransaction({ ... }).then(function (saved) { ... });
+
+   Every function returns a Promise:
+     .then(function (result) { ... })   runs when it worked
+     .catch(function (error) { ... })   runs when it failed
+   error.message is always a plain sentence you can show the user.
+   ========================================================== */
+(function () {
+  'use strict';
+
+  const SpendWise = (window.SpendWise = window.SpendWise || {});
+  const utils = SpendWise.utils;
+
+  /* ---------- Settings for the database ---------- */
+  const DB_NAME = 'spendwise-db';
+  const DB_VERSION = 1;               // raise this number only when the structure changes
+  const STORE_TRANSACTIONS = 'transactions';
+  const STORE_SETTINGS = 'settings';  // used later for budget and categories
+
+  const TYPES = ['income', 'expense'];
+  const PAYMENT_METHODS = ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Other'];
+  const MAX_AMOUNT = 1000000000;
+
+  let dbPromise = null; // the open database is kept here so we only open it once
+
+  /* ---------- Error helpers ---------- */
+
+  // Turns any low-level browser error into one clear message.
+  function friendlyError(err, fallback) {
+    if (err && err.isAppError) return err; // already friendly
+    let message = fallback || 'Something went wrong while saving your data.';
+    if (err && err.name === 'QuotaExceededError') {
+      message = 'Your phone storage is full. Free some space and try again.';
+    } else if (err && err.name === 'VersionError') {
+      message = 'The saved data is from a newer version of SpendWise.';
+    } else if (err && err.name === 'InvalidStateError') {
+      message = 'Storage is unavailable. Private browsing mode can cause this.';
+    }
+    const error = new Error(message);
+    error.isAppError = true;
+    error.original = err;
+    console.error('[SpendWise db]', err);
+    return error;
+  }
+
+  function appError(message, extra) {
+    const error = new Error(message);
+    error.isAppError = true;
+    if (extra) Object.assign(error, extra);
+    return error;
+  }
+
+  /* ---------- 1. Open / create the database ---------- */
+  function openDatabase() {
+    if (dbPromise) return dbPromise;
+
+    dbPromise = new Promise(function (resolve, reject) {
+      if (!window.indexedDB) {
+        reject(appError('This browser cannot store data offline (IndexedDB missing).'));
+        return;
+      }
+
+      let request;
+      try {
+        request = window.indexedDB.open(DB_NAME, DB_VERSION);
+      } catch (err) {
+        reject(friendlyError(err, 'Could not open the database.'));
+        return;
+      }
+
+      // Runs the first time the app opens (or when DB_VERSION goes up).
+      // This is where the "tables" (called object stores) are created.
+      request.onupgradeneeded = function () {
+        const db = request.result;
+
+        if (!db.objectStoreNames.contains(STORE_TRANSACTIONS)) {
+          // "id" is created automatically: 1, 2, 3 ...
+          const store = db.createObjectStore(STORE_TRANSACTIONS, {
+            keyPath: 'id',
+            autoIncrement: true
+          });
+          // Indexes make searching by these fields fast
+          store.createIndex('date', 'date', { unique: false });
+          store.createIndex('type', 'type', { unique: false });
+          store.createIndex('category', 'category', { unique: false });
+        }
+
+        if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
+          db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
+        }
+      };
+
+      request.onsuccess = function () {
+        const db = request.result;
+        // If another tab upgrades the database, close ours so it is not blocked
+        db.onversionchange = function () {
+          db.close();
+          dbPromise = null;
+        };
+        resolve(db);
+      };
+
+      request.onerror = function () {
+        reject(friendlyError(request.error, 'Could not open the database.'));
+      };
+
+      request.onblocked = function () {
+        console.warn('[SpendWise db] Opening is blocked by another open tab.');
+      };
+    }).catch(function (err) {
+      dbPromise = null; // allow a retry next time
+      throw err;
+    });
+
+    return dbPromise;
+  }
+
+  /* ---------- Shared helper: run one database transaction ----------
+     storeName : which store to use
+     mode      : 'readonly' or 'readwrite'
+     work      : function (store, setResult, fail)
+                   store     - the store to read or write
+                   setResult - call it with the value you want returned
+                   fail      - call it with an error to cancel everything
+     The Promise resolves only after the browser has fully committed
+     the change, so a "saved" message is always truthful. */
+  function runTransaction(storeName, mode, work) {
+    return openDatabase().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        let tx;
+        try {
+          tx = db.transaction(storeName, mode);
+        } catch (err) {
+          reject(friendlyError(err));
+          return;
+        }
+
+        let result;
+        let failure = null;
+
+        function setResult(value) { result = value; }
+        function fail(err) {
+          failure = err;
+          try { tx.abort(); } catch (e) { /* already finished */ }
+        }
+
+        tx.oncomplete = function () { resolve(result); };
+        tx.onabort = function () { reject(failure || friendlyError(tx.error)); };
+        tx.onerror = function () { /* onabort follows and reports it */ };
+
+        try {
+          work(tx.objectStore(storeName), setResult, fail);
+        } catch (err) {
+          fail(friendlyError(err));
+        }
+      });
+    });
+  }
+
+  /* ---------- Validation ----------
+     Returns { ok, errors, clean }
+       errors : { fieldName: "message" } for every wrong field
+       clean  : the tidied-up version of the data, safe to store
+     The Add form uses this same function. */
+  function validateTransaction(input) {
+    const src = input || {};
+    const errors = {};
+
+    const title = String(src.title == null ? '' : src.title).trim();
+    if (!title) errors.title = 'Enter a title.';
+    else if (title.length > 60) errors.title = 'Title can be at most 60 characters.';
+
+    let amount = typeof src.amount === 'number'
+      ? src.amount
+      : Number(String(src.amount == null ? '' : src.amount).trim());
+    if (!isFinite(amount)) {
+      errors.amount = 'Enter a valid number.';
+    } else if (amount <= 0) {
+      errors.amount = 'Amount must be greater than zero.';
+    } else if (amount > MAX_AMOUNT) {
+      errors.amount = 'Amount is too large.';
+    } else {
+      amount = utils.roundMoney(amount);
+      if (amount <= 0) errors.amount = 'Amount must be at least 0.01.';
+    }
+
+    const type = String(src.type == null ? '' : src.type).trim();
+    if (TYPES.indexOf(type) === -1) errors.type = 'Choose income or expense.';
+
+    const category = String(src.category == null ? '' : src.category).trim();
+    if (!category) errors.category = 'Choose a category.';
+    else if (category.length > 40) errors.category = 'Category name is too long.';
+
+    const date = String(src.date == null ? '' : src.date).trim();
+    if (!utils.isValidDateISO(date)) errors.date = 'Choose a valid date.';
+
+    const paymentMethod = String(src.paymentMethod == null ? '' : src.paymentMethod).trim();
+    if (PAYMENT_METHODS.indexOf(paymentMethod) === -1) {
+      errors.paymentMethod = 'Choose a payment method.';
+    }
+
+    const note = String(src.note == null ? '' : src.note).trim();
+    if (note.length > 200) errors.note = 'Note can be at most 200 characters.';
+
+    return {
+      ok: Object.keys(errors).length === 0,
+      errors: errors,
+      clean: {
+        title: title,
+        amount: amount,
+        type: type,
+        category: category,
+        date: date,
+        paymentMethod: paymentMethod,
+        note: note
+      }
+    };
+  }
+
+  function validationError(errors) {
+    const firstMessage = errors[Object.keys(errors)[0]];
+    return appError(firstMessage || 'Some details are not valid.', {
+      isValidation: true,
+      fields: errors
+    });
+  }
+
+  function toId(id) {
+    const number = Number(id);
+    return isFinite(number) ? number : null;
+  }
+
+  /* ---------- 2. Save a new transaction ---------- */
+  function addTransaction(data) {
+    const check = validateTransaction(data);
+    if (!check.ok) return Promise.reject(validationError(check.errors));
+
+    const now = new Date().toISOString();
+    const record = Object.assign({}, check.clean, { createdAt: now, updatedAt: now });
+
+    return runTransaction(STORE_TRANSACTIONS, 'readwrite', function (store, setResult) {
+      const request = store.add(record);
+      request.onsuccess = function () {
+        setResult(Object.assign({}, record, { id: request.result }));
+      };
+    });
+  }
+
+  /* ---------- 3. Read all transactions (newest first) ---------- */
+  function getAllTransactions() {
+    return runTransaction(STORE_TRANSACTIONS, 'readonly', function (store, setResult) {
+      const request = store.getAll();
+      request.onsuccess = function () {
+        const list = request.result || [];
+        list.sort(function (a, b) {
+          if (a.date !== b.date) return a.date < b.date ? 1 : -1;       // newer date first
+          if (a.createdAt !== b.createdAt) return a.createdAt < b.createdAt ? 1 : -1;
+          return b.id - a.id;
+        });
+        setResult(list);
+      };
+    });
+  }
+
+  // Read one transaction. Resolves with null if it does not exist.
+  function getTransaction(id) {
+    const key = toId(id);
+    if (key === null) return Promise.resolve(null);
+    return runTransaction(STORE_TRANSACTIONS, 'readonly', function (store, setResult) {
+      const request = store.get(key);
+      request.onsuccess = function () { setResult(request.result || null); };
+    });
+  }
+
+  /* ---------- 4. Update an existing transaction ----------
+     "changes" only needs the fields you want to change, e.g.
+       SpendWise.db.updateTransaction(7, { amount: 250 }) */
+  function updateTransaction(id, changes) {
+    const key = toId(id);
+    if (key === null) return Promise.reject(appError('That transaction could not be found.'));
+
+    return runTransaction(STORE_TRANSACTIONS, 'readwrite', function (store, setResult, fail) {
+      const getRequest = store.get(key);
+      getRequest.onsuccess = function () {
+        const existing = getRequest.result;
+        if (!existing) {
+          fail(appError('That transaction no longer exists.'));
+          return;
+        }
+
+        // Combine old values with the changes, then check the result
+        const merged = Object.assign({}, existing, changes || {});
+        const check = validateTransaction(merged);
+        if (!check.ok) {
+          fail(validationError(check.errors));
+          return;
+        }
+
+        const updated = Object.assign({}, existing, check.clean, {
+          id: existing.id,
+          createdAt: existing.createdAt,
+          updatedAt: new Date().toISOString()
+        });
+        const putRequest = store.put(updated);
+        putRequest.onsuccess = function () { setResult(updated); };
+      };
+    });
+  }
+
+  /* ---------- 5. Delete a transaction ---------- */
+  function deleteTransaction(id) {
+    const key = toId(id);
+    if (key === null) return Promise.reject(appError('That transaction could not be found.'));
+
+    return runTransaction(STORE_TRANSACTIONS, 'readwrite', function (store, setResult, fail) {
+      const getRequest = store.get(key);
+      getRequest.onsuccess = function () {
+        if (!getRequest.result) {
+          fail(appError('That transaction no longer exists.'));
+          return;
+        }
+        const deleteRequest = store.delete(key);
+        deleteRequest.onsuccess = function () { setResult(true); };
+      };
+    });
+  }
+
+  /* ---------- Settings store (budget, categories - used in later stages) ---------- */
+  function getSetting(key, defaultValue) {
+    return runTransaction(STORE_SETTINGS, 'readonly', function (store, setResult) {
+      const request = store.get(key);
+      request.onsuccess = function () {
+        setResult(request.result ? request.result.value : defaultValue);
+      };
+    });
+  }
+
+  function setSetting(key, value) {
+    return runTransaction(STORE_SETTINGS, 'readwrite', function (store, setResult) {
+      const request = store.put({ key: key, value: value });
+      request.onsuccess = function () { setResult(value); };
+    });
+  }
+
+  /* Replace every transaction at once (used by Restore, Clear all, Remove sample data) */
+  function replaceAllTransactions(list) {
+    const now = new Date().toISOString();
+    const records = [];
+    for (let i = 0; i < (list || []).length; i++) {
+      const item = list[i];
+      const check = validateTransaction(item);
+      if (!check.ok) return Promise.reject(validationError(check.errors));
+      records.push(Object.assign({}, check.clean, {
+        createdAt: typeof item.createdAt === 'string' ? item.createdAt : now,
+        updatedAt: typeof item.updatedAt === 'string' ? item.updatedAt : now
+      }));
+    }
+    return runTransaction(STORE_TRANSACTIONS, 'readwrite', function (store, setResult) {
+      store.clear();
+      records.forEach(function (r) { store.add(r); });
+      setResult(records.length);
+    });
+  }
+
+  /* ---------- Public API ---------- */
+  SpendWise.db = {
+    TYPES: TYPES,
+    PAYMENT_METHODS: PAYMENT_METHODS,
+    init: function () { return openDatabase().then(function () { return true; }); },
+    validateTransaction: validateTransaction,
+    addTransaction: addTransaction,
+    getAllTransactions: getAllTransactions,
+    getTransaction: getTransaction,
+    updateTransaction: updateTransaction,
+    deleteTransaction: deleteTransaction,
+    replaceAllTransactions: replaceAllTransactions,
+    getSetting: getSetting,
+    setSetting: setSetting
+  };
+})();
+  </script>
+
+  <!-- PART 3 of 5 - dbtest.js: temporary database self-test (optional developer tool) -->
+  <script>
+/* ==========================================================
+   SpendWise – dbtest.js   (developer tool)
+   Powers the self-test card on the Profile screen so you
+   can test the database on your phone without a developer console.
+   ========================================================== */
+(function () {
+  'use strict';
+
+  const SpendWise = (window.SpendWise = window.SpendWise || {});
+  const TEST_TITLE = 'Stage 2 test';
+
+  function logBox() { return document.getElementById('dbtest-log'); }
+
+  function write(lines) {
+    const box = logBox();
+    if (box) box.textContent = lines.join('\n');
+  }
+
+  function sample(overrides) {
+    return Object.assign({
+      title: TEST_TITLE,
+      amount: 120.5,
+      type: 'expense',
+      category: 'Food',
+      date: SpendWise.utils.todayISO(),
+      paymentMethod: 'UPI',
+      note: ''
+    }, overrides || {});
+  }
+
+  /* ----- Button 1: automatic self-test (cleans up after itself) ----- */
+  function runSelfTest() {
+    const db = SpendWise.db;
+    const log = [];
+    const createdIds = [];
+    let failed = false;
+
+    function pass(text) { log.push('PASS  ' + text); write(log); }
+    function fail(text) { failed = true; log.push('FAIL  ' + text); write(log); }
+    function check(condition, text) { condition ? pass(text) : fail(text); }
+
+    write(['Running...']);
+
+    return db.init()
+      .then(function () { pass('Database opened'); return db.addTransaction(sample({ title: 'Stage 2 test A' })); })
+      .then(function (a) {
+        createdIds.push(a.id);
+        check(typeof a.id === 'number', 'Saved an expense (id ' + a.id + ')');
+        return db.addTransaction(sample({ title: 'Stage 2 test B', type: 'income', category: 'Salary', amount: 5000, date: '2020-01-15' }));
+      })
+      .then(function (b) {
+        createdIds.push(b.id);
+        check(typeof b.id === 'number', 'Saved an income (id ' + b.id + ')');
+        return db.getAllTransactions();
+      })
+      .then(function (all) {
+        const mine = all.filter(function (t) { return createdIds.indexOf(t.id) !== -1; });
+        check(mine.length === 2, 'Read both transactions back');
+        check(mine[0].title === 'Stage 2 test A', 'Newest date comes first');
+        return db.updateTransaction(createdIds[0], { amount: 99.999 });
+      })
+      .then(function (updated) {
+        check(updated.amount === 100, 'Updated amount, rounded to 2 decimals (100)');
+        return db.getTransaction(createdIds[0]);
+      })
+      .then(function (reread) {
+        check(reread && reread.amount === 100, 'Update was stored');
+        return db.addTransaction(sample({ amount: -5 })).then(
+          function () { fail('Negative amount was NOT rejected'); },
+          function (err) { check(err.isValidation, 'Negative amount rejected: "' + err.message + '"'); }
+        );
+      })
+      .then(function () {
+        return db.addTransaction(sample({ date: '2026-02-30' })).then(
+          function () { fail('Impossible date was NOT rejected'); },
+          function (err) { check(err.isValidation, 'Impossible date rejected: "' + err.message + '"'); }
+        );
+      })
+      .then(function () {
+        return db.updateTransaction(999999999, { amount: 5 }).then(
+          function () { fail('Updating a missing id was NOT rejected'); },
+          function (err) { check(Boolean(err.message), 'Missing id rejected: "' + err.message + '"'); }
+        );
+      })
+      .then(function () { return db.deleteTransaction(createdIds[0]); })
+      .then(function () { return db.deleteTransaction(createdIds[1]); })
+      .then(function () { return db.getAllTransactions(); })
+      .then(function (all) {
+        const left = all.filter(function (t) { return createdIds.indexOf(t.id) !== -1; });
+        check(left.length === 0, 'Deleted both test transactions');
+        log.push('');
+        log.push(failed ? 'RESULT: some checks FAILED' : 'RESULT: all checks passed');
+        write(log);
+      })
+      .catch(function (err) {
+        fail('Unexpected error: ' + err.message);
+        // Clean up anything we created before the error
+        createdIds.forEach(function (id) { db.deleteTransaction(id).catch(function () {}); });
+      });
+  }
+
+  /* ----- Button 2: save one test transaction (to test persistence) ----- */
+  function addTestTransaction() {
+    return SpendWise.db.addTransaction(sample())
+      .then(function (saved) {
+        SpendWise.toast('Saved test transaction #' + saved.id);
+        return showStored();
+      })
+      .catch(function (err) { SpendWise.toast(err.message, true); });
+  }
+
+  /* ----- Button 3: list what is stored ----- */
+  function showStored() {
+    return SpendWise.db.getAllTransactions()
+      .then(function (all) {
+        const lines = ['Transactions stored: ' + all.length];
+        all.slice(0, 15).forEach(function (t) {
+          lines.push('#' + t.id + '  ' + t.date + '  ' + t.type + '  ' + t.amount.toFixed(2) + '  ' + t.title);
+        });
+        if (all.length > 15) lines.push('... and ' + (all.length - 15) + ' more');
+        write(lines);
+      })
+      .catch(function (err) { write(['Error: ' + err.message]); });
+  }
+
+  /* ----- Button 4: remove only the test transactions ----- */
+  function removeTestTransactions() {
+    return SpendWise.db.getAllTransactions()
+      .then(function (all) {
+        const tests = all.filter(function (t) { return t.title === TEST_TITLE; });
+        return Promise.all(tests.map(function (t) { return SpendWise.db.deleteTransaction(t.id); }))
+          .then(function () { SpendWise.toast('Removed ' + tests.length + ' test transaction(s)'); });
+      })
+      .then(showStored)
+      .catch(function (err) { SpendWise.toast(err.message, true); });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const wire = function (id, fn) {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', fn);
+    };
+    wire('dbtest-run', runSelfTest);
+    wire('dbtest-add', addTestTransaction);
+    wire('dbtest-show', showStored);
+    wire('dbtest-remove', removeTestTransactions);
+  });
+})();
+  </script>
+
+  <!-- PART 4 of 5 - main.js: the five screens -->
+  <script>
+/* ==========================================================
+   SpendWise – main.js
+   The five screens: Home, History, Add, Analytics, Profile.
+   Data flow: every screen reads from IndexedDB (through db.js),
+   keeps a copy in "state", and draws itself from that copy.
+   After any change we call refresh() so every number updates.
+   ========================================================== */
+(function () {
+  'use strict';
+
+  const SW = window.SpendWise, db = SW.db, U = SW.utils;
+  const EXP = ['Food', 'Transport', 'Shopping', 'Education', 'Health', 'Bills', 'Rent', 'Entertainment', 'Other'];
+  const INC = ['Salary', 'Scholarship', 'Freelance', 'Business', 'Gift', 'Other'];
+  const SAMPLE_NOTE = 'Sample data';
+  SW.views = SW.views || {}; // app.js loads after this file, so make sure the list exists
+  const state = { tx: [], budget: 0, editId: null, loaded: false };
+
+  /* ---------- Small helpers ---------- */
+  const $ = function (id) { return document.getElementById(id); };
+  const today = function () { return U.todayISO(); };
+  const pad = function (n) { return String(n).padStart(2, '0'); };
+
+  function esc(s) { // stops user text from being treated as HTML
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function money(n) {
+    const v = Number(n);
+    return (v < 0 ? '−' : '') + '₹' + Math.abs(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function sum(list, type) {
+    return U.roundMoney(list.filter(function (t) { return t.type === type; })
+      .reduce(function (a, t) { return a + t.amount; }, 0));
+  }
+  function monthOf(iso) { return iso.slice(0, 7); }
+  function shiftMonth(key, delta) {
+    const p = key.split('-').map(Number), d = new Date(p[0], p[1] - 1 + delta, 1);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+  }
+  function daysIn(key) { const p = key.split('-').map(Number); return new Date(p[0], p[1], 0).getDate(); }
+  function fmtDate(iso) {
+    const p = iso.split('-').map(Number);
+    return new Date(p[0], p[1] - 1, p[2]).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  function monthLabel(key, short) {
+    const p = key.split('-').map(Number);
+    return new Date(p[0], p[1] - 1, 1).toLocaleDateString('en-IN', short ? { month: 'short' } : { month: 'long', year: 'numeric' });
+  }
+  function offsetDate(n) {
+    const d = new Date(); d.setDate(d.getDate() + n);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function expensesOf(key) { // expense transactions in one month
+    return state.tx.filter(function (t) { return t.type === 'expense' && monthOf(t.date) === key; });
+  }
+  function total(list) { return U.roundMoney(list.reduce(function (a, t) { return a + t.amount; }, 0)); }
+  function byCategory(list) { // [["Food", 500], ...] biggest first
+    const m = {};
+    list.forEach(function (t) { m[t.category] = (m[t.category] || 0) + t.amount; });
+    return Object.keys(m).map(function (k) { return [k, U.roundMoney(m[k])]; })
+      .sort(function (a, b) { return b[1] - a[1]; });
+  }
+
+  /* ---------- Reusable pieces of HTML ---------- */
+  function emptyState(icon, title, text, buttons) {
+    return '<div class="empty-state"><div class="empty-icon"><svg><use href="#i-' + icon + '"/></svg></div><h2>' +
+      title + '</h2><p>' + text + '</p>' + (buttons || '') + '</div>';
+  }
+  function row(t, withActions) {
+    const inc = t.type === 'income', c = inc ? 'in' : 'out';
+    return '<div class="tx"><div class="tx-ico ' + c + '">' + esc(t.category.charAt(0).toUpperCase()) + '</div>' +
+      '<div class="tx-main"><div class="tx-title">' + esc(t.title) + '</div>' +
+      '<div class="tx-meta">' + esc(t.category) + ' · ' + esc(t.paymentMethod) + ' · ' + fmtDate(t.date) + '</div>' +
+      (t.note ? '<div class="tx-note">' + esc(t.note) + '</div>' : '') +
+      (withActions ? '<div class="tx-actions"><button type="button" class="link" data-act="edit" data-id="' + t.id +
+        '">Edit</button><button type="button" class="link danger" data-act="delete" data-id="' + t.id + '">Delete</button></div>' : '') +
+      '</div><div class="tx-amt ' + c + '">' + (inc ? '+' : '−') + money(t.amount) + '</div></div>';
+  }
+  function catBars(cats, totalAmount) {
+    return cats.map(function (c) {
+      const pct = totalAmount > 0 ? c[1] / totalAmount * 100 : 0;
+      return '<div class="bar-row"><div class="bar-head"><span>' + esc(c[0]) + '</span><span>' + money(c[1]) +
+        ' · ' + pct.toFixed(0) + '%</span></div><div class="bar"><span style="width:' + pct.toFixed(1) + '%"></span></div></div>';
+    }).join('');
+  }
+
+  /* ---------- Budget ---------- */
+  function budgetInfo() {
+    const spent = total(expensesOf(monthOf(today()))), b = state.budget;
+    const pct = b > 0 ? spent / b * 100 : 0;
+    return { budget: b, spent: spent, remaining: U.roundMoney(b - spent), pct: pct,
+      level: pct > 100 ? 'over' : pct >= 80 ? 'warn' : 'ok' };
+  }
+  function budgetBody(b) {
+    if (!b.budget) return '<p class="muted" style="margin-top:8px">No monthly budget set yet.</p>';
+    const cls = b.level === 'over' ? ' is-over' : b.level === 'warn' ? ' is-warn' : '';
+    let msg = '';
+    if (b.level === 'over') msg = '<div class="alert over">Budget exceeded by ' + money(-b.remaining) + '.</div>';
+    else if (b.level === 'warn') msg = '<div class="alert warn">' + (b.pct >= 100 ? 'Your budget is fully used.' :
+      'Careful: ' + Math.round(b.pct) + '% of your budget is used.') + '</div>';
+    return '<div class="bar-head" style="margin-top:10px"><span>' + money(b.spent) + ' spent</span><span>' + money(b.budget) +
+      ' budget</span></div><div class="progress' + cls + '" style="margin-top:8px"><span style="width:' +
+      Math.min(100, b.pct).toFixed(1) + '%"></span></div><div class="bar-head" style="margin-top:8px"><span class="muted">' +
+      (b.remaining >= 0 ? money(b.remaining) + ' remaining' : 'Over by ' + money(-b.remaining)) +
+      '</span><strong>' + b.pct.toFixed(0) + '% used</strong></div>' + msg;
+  }
+
+  /* ---------- Loading data ---------- */
+  function reload() {
+    return Promise.all([db.getAllTransactions(), db.getSetting('budget', 0)]).then(function (r) {
+      state.tx = r[0];
+      state.budget = Number(r[1]) || 0;
+      state.loaded = true;
+    });
+  }
+  function activeRoute() {
+    const h = window.location.hash.replace('#', '');
+    return DRAW[h] ? h : 'home';
+  }
+  function fail(err) { SW.toast(err.message || 'Something went wrong.', true); }
+  function refresh() { return reload().then(function () { DRAW[activeRoute()](); }).catch(fail); }
+  function resetIfEditing() { if (state.editId !== null) resetForm(); }
+
+  /* ---------- Confirmation pop-up (returns a Promise: true / false) ---------- */
+  function ask(title, message, okLabel) {
+    return new Promise(function (resolve) {
+      const modal = $('modal');
+      $('m-title').textContent = title;
+      $('m-msg').textContent = message;
+      $('m-ok').textContent = okLabel || 'Confirm';
+      modal.hidden = false;
+      function done(value) { modal.hidden = true; modal.onclick = null; resolve(value); }
+      $('m-ok').onclick = function () { done(true); };
+      $('m-cancel').onclick = function () { done(false); };
+      modal.onclick = function (e) { if (e.target === modal) done(false); };
+    });
+  }
+
+  /* ================= HOME ================= */
+  function renderHome() {
+    resetIfEditing();
+    const el = $('home-body');
+    if (!state.loaded) return;
+    if (!state.tx.length) {
+      el.innerHTML = emptyState('wallet', 'Welcome to SpendWise',
+        'Add your first transaction, or load sample data to explore the app.',
+        '<button type="button" class="btn" data-act="goto-add">Add transaction</button>' +
+        '<button type="button" class="btn btn-secondary" data-act="sample">Load sample data</button>');
+      return;
+    }
+    const inc = sum(state.tx, 'income'), exp = sum(state.tx, 'expense'), bal = U.roundMoney(inc - exp);
+    const td = today(), mk = monthOf(td);
+    const todaySp = total(state.tx.filter(function (t) { return t.type === 'expense' && t.date === td; }));
+    const monthList = expensesOf(mk), monthSp = total(monthList);
+    const cats = byCategory(monthList).slice(0, 4);
+    el.innerHTML =
+      '<div class="hero"><div class="label">Available balance</div><div class="val">' + money(bal) + '</div></div>' +
+      '<div class="grid2"><div class="card stat"><div class="label">Total income</div><div class="val in">' + money(inc) + '</div></div>' +
+      '<div class="card stat"><div class="label">Total expenses</div><div class="val out">' + money(exp) + '</div></div>' +
+      '<div class="card stat"><div class="label">Today\'s spending</div><div class="val">' + money(todaySp) + '</div></div>' +
+      '<div class="card stat"><div class="label">This month\'s spending</div><div class="val">' + money(monthSp) + '</div></div></div>' +
+      '<div class="card"><div class="card-head"><h2>Monthly budget</h2><a href="#settings">' + (state.budget ? 'Edit' : 'Set budget') + '</a></div>' +
+      budgetBody(budgetInfo()) + '</div>' +
+      '<div class="card"><h2>Spending by category</h2><p class="muted" style="font-size:.8125rem">' + monthLabel(mk) + '</p>' +
+      (cats.length ? catBars(cats, monthSp) : '<p class="muted" style="margin-top:8px">No expenses this month yet.</p>') + '</div>' +
+      '<div class="card"><div class="card-head"><h2>Recent transactions</h2><a href="#history">See all</a></div>' +
+      state.tx.slice(0, 5).map(function (t) { return row(t, false); }).join('') + '</div>';
+  }
+
+  /* ================= HISTORY ================= */
+  function filtered() {
+    const q = $('f-search').value.trim().toLowerCase(), ty = $('f-type').value, cat = $('f-cat').value;
+    const from = $('f-from').value, to = $('f-to').value;
+    return state.tx.filter(function (t) {
+      return (!q || t.title.toLowerCase().indexOf(q) !== -1) && (!ty || t.type === ty) &&
+        (!cat || t.category === cat) && (!from || t.date >= from) && (!to || t.date <= to);
+    });
+  }
+  function renderHistory() {
+    resetIfEditing();
+    if (!state.loaded) return;
+    const list = filtered(), box = $('history-list');
+    $('history-count').textContent = state.tx.length ? list.length + ' of ' + state.tx.length + ' transactions' : '';
+    if (!state.tx.length) {
+      box.innerHTML = emptyState('history', 'No transactions yet', 'Transactions you add will appear here.',
+        '<button type="button" class="btn" data-act="goto-add">Add transaction</button>');
+    } else if (!list.length) {
+      box.innerHTML = emptyState('history', 'No matches', 'Try a different search or clear the filters.');
+    } else {
+      box.innerHTML = '<div class="card">' + list.map(function (t) { return row(t, true); }).join('') + '</div>';
+    }
+  }
+  function askDelete(id) {
+    const t = state.tx.filter(function (x) { return x.id === id; })[0];
+    if (!t) return;
+    ask('Delete transaction?', '"' + t.title + '" (' + money(t.amount) + ') will be removed permanently.', 'Delete')
+      .then(function (ok) {
+        if (!ok) return;
+        return db.deleteTransaction(id).then(refresh).then(function () { SW.toast('Transaction deleted'); });
+      }).catch(fail);
+  }
+
+  /* ================= ADD / EDIT ================= */
+  function curType() { return document.querySelector('input[name="type"]:checked').value; }
+  function fillCategories(selected) {
+    const list = curType() === 'income' ? INC : EXP;
+    $('a-category').innerHTML = list.map(function (c) {
+      return '<option' + (c === selected ? ' selected' : '') + '>' + c + '</option>';
+    }).join('');
+  }
+  function showErrors(errors) {
+    ['type', 'title', 'amount', 'category', 'date', 'paymentMethod', 'note'].forEach(function (f) {
+      $('e-' + f).textContent = errors[f] || '';
+    });
+  }
+  function resetForm() {
+    state.editId = null;
+    $('tx-form').reset();
+    document.querySelector('input[name="type"][value="expense"]').checked = true;
+    fillCategories();
+    $('a-date').value = today();
+    showErrors({});
+  }
+  function renderAdd() {
+    const editing = state.editId !== null;
+    $('topbar-title').textContent = editing ? 'Edit transaction' : 'Add transaction';
+    $('topbar-sub').textContent = editing ? 'Update the details below' : 'Record income or an expense';
+    $('a-submit').textContent = editing ? 'Save changes' : 'Save transaction';
+    $('a-cancel').hidden = !editing;
+  }
+  function startEdit(id) {
+    const t = state.tx.filter(function (x) { return x.id === id; })[0];
+    if (!t) return;
+    resetForm();
+    state.editId = id;
+    document.querySelector('input[name="type"][value="' + t.type + '"]').checked = true;
+    fillCategories(t.category);
+    $('a-title').value = t.title;
+    $('a-amount').value = t.amount;
+    $('a-date').value = t.date;
+    $('a-method').value = t.paymentMethod;
+    $('a-note').value = t.note || '';
+    SW.go('add');
+  }
+  function onSubmit(e) {
+    e.preventDefault();
+    const data = {
+      title: $('a-title').value, amount: $('a-amount').value, type: curType(), category: $('a-category').value,
+      date: $('a-date').value, paymentMethod: $('a-method').value, note: $('a-note').value
+    };
+    const check = db.validateTransaction(data);
+    showErrors(check.errors);
+    if (!check.ok) { SW.toast('Please fix the highlighted fields.', true); return; }
+    const editing = state.editId;
+    const job = editing !== null ? db.updateTransaction(editing, data) : db.addTransaction(data);
+    job.then(function () {
+      resetForm();
+      return refresh();
+    }).then(function () {
+      if (editing !== null) { SW.go('history'); SW.toast('Transaction updated'); }
+      else SW.toast('Transaction saved successfully ✓');
+    }).catch(function (err) {
+      if (err.fields) showErrors(err.fields);
+      fail(err);
+    });
+  }
+
+  /* ================= ANALYTICS ================= */
+  function renderAnalytics() {
+    resetIfEditing();
+    if (!state.loaded) return;
+    const body = $('analytics-body'), thisMonth = monthOf(today());
+    const key = $('an-month').value || thisMonth;
+    const list = state.tx.filter(function (t) { return monthOf(t.date) === key; });
+    if (!list.length) {
+      body.innerHTML = emptyState('chart', 'No data for ' + monthLabel(key),
+        'Add transactions in this month, or pick another month above.');
+      return;
+    }
+    const inc = sum(list, 'income'), exp = sum(list, 'expense'), net = U.roundMoney(inc - exp);
+    const expList = list.filter(function (t) { return t.type === 'expense'; });
+    const n = daysIn(key), perDay = [];
+    for (let i = 0; i < n; i++) perDay.push(0);
+    expList.forEach(function (t) { perDay[Number(t.date.slice(8)) - 1] += t.amount; });
+    const maxDay = Math.max.apply(null, perDay), hiIndex = perDay.indexOf(maxDay);
+    const elapsed = key === thisMonth ? Number(today().slice(8)) : key < thisMonth ? n : 0;
+    const avg = elapsed > 0 ? U.roundMoney(exp / elapsed) : 0;
+    const prevKey = shiftMonth(key, -1), prevExp = total(expensesOf(prevKey));
+    let cmp;
+    if (prevExp === 0) cmp = 'No spending recorded in ' + monthLabel(prevKey) + ' to compare with.';
+    else {
+      const diff = U.roundMoney(exp - prevExp), pct = Math.abs(diff / prevExp * 100).toFixed(0);
+      cmp = diff === 0 ? 'Same as ' + monthLabel(prevKey) + ' (' + money(prevExp) + ').' :
+        (diff > 0 ? 'Up ' : 'Down ') + pct + '% (' + money(Math.abs(diff)) + (diff > 0 ? ' more' : ' less') +
+        ') than ' + monthLabel(prevKey) + ' (' + money(prevExp) + ').';
+    }
+    const big = Math.max(inc, exp, 1);
+    let months = [], maxM = 1;
+    for (let i = 5; i >= 0; i--) {
+      const k = shiftMonth(key, -i), ml = state.tx.filter(function (t) { return monthOf(t.date) === k; });
+      const m = { k: k, i: sum(ml, 'income'), e: sum(ml, 'expense') };
+      maxM = Math.max(maxM, m.i, m.e); months.push(m);
+    }
+    body.innerHTML =
+      '<div class="card"><h2>Income vs expenses</h2><p class="muted" style="font-size:.8125rem">' + monthLabel(key) + '</p>' +
+      '<div class="bar-row"><div class="bar-head"><span>Income</span><span>' + money(inc) + '</span></div><div class="bar in"><span style="width:' + (inc / big * 100).toFixed(1) + '%"></span></div></div>' +
+      '<div class="bar-row"><div class="bar-head"><span>Expenses</span><span>' + money(exp) + '</span></div><div class="bar out"><span style="width:' + (exp / big * 100).toFixed(1) + '%"></span></div></div>' +
+      '<div class="alert">' + (net >= 0 ? 'Saved this month: ' : 'Overspent this month: ') + '<strong>' + money(Math.abs(net)) + '</strong></div></div>' +
+      '<div class="grid2"><div class="card stat"><div class="label">Average daily spending</div><div class="val">' + money(avg) + '</div></div>' +
+      '<div class="card stat"><div class="label">Highest spending day</div><div class="val">' + (maxDay > 0 ? money(maxDay) : '—') + '</div>' +
+      (maxDay > 0 ? '<div class="label">' + fmtDate(key + '-' + pad(hiIndex + 1)) + '</div>' : '') + '</div></div>' +
+      '<div class="card"><h2>Previous-month comparison</h2><p class="muted" style="margin-top:6px">' + cmp + '</p></div>' +
+      '<div class="card"><h2>Daily spending</h2><p class="muted" style="font-size:.8125rem;margin-bottom:12px">Each bar is one day of ' + monthLabel(key) + '</p>' +
+      '<div class="daily">' + perDay.map(function (v, i) {
+        return '<i class="' + (i === hiIndex && v > 0 ? 'hi' : '') + '" style="height:' + (maxDay > 0 ? Math.max(2, v / maxDay * 100) : 2).toFixed(1) +
+          '%" title="Day ' + (i + 1) + ': ' + money(v) + '"></i>';
+      }).join('') + '</div><div class="axis"><span>1</span><span>' + Math.ceil(n / 2) + '</span><span>' + n + '</span></div></div>' +
+      '<div class="card"><h2>Spending by category</h2>' +
+      (expList.length ? catBars(byCategory(expList), exp) : '<p class="muted" style="margin-top:8px">No expenses this month.</p>') + '</div>' +
+      '<div class="card"><h2>Monthly summary</h2><p class="muted" style="font-size:.8125rem;margin-bottom:12px">Last 6 months</p><div class="months">' +
+      months.map(function (m) {
+        return '<div><div class="pair"><i class="in" style="height:' + (m.i / maxM * 100).toFixed(1) + '%" title="Income ' + money(m.i) +
+          '"></i><i class="out" style="height:' + (m.e / maxM * 100).toFixed(1) + '%" title="Expenses ' + money(m.e) + '"></i></div><div class="lbl">' +
+          monthLabel(m.k, true) + '</div></div>';
+      }).join('') + '</div><div class="legend"><b style="background:var(--light-blue)"></b>Income &nbsp; <b style="background:var(--navy)"></b>Expenses</div></div>';
+  }
+
+  /* ================= PROFILE / SETTINGS ================= */
+  function renderSettings() {
+    resetIfEditing();
+    if (!state.loaded) return;
+    if (document.activeElement !== $('b-input')) $('b-input').value = state.budget || '';
+    $('budget-status').innerHTML = budgetBody(budgetInfo());
+    $('d-count').textContent = state.tx.length + ' transaction' + (state.tx.length === 1 ? '' : 's') + ' stored on this device';
+    $('btn-unsample').hidden = !state.tx.some(function (t) { return t.note === SAMPLE_NOTE; });
+  }
+  function saveBudget() {
+    const raw = $('b-input').value.trim(), v = Number(raw);
+    if (raw === '' || !isFinite(v) || v < 0 || v > 1000000000) {
+      $('b-error').textContent = 'Enter an amount of 0 or more (0 removes the budget).'; return;
+    }
+    $('b-error').textContent = '';
+    db.setSetting('budget', U.roundMoney(v)).then(refresh)
+      .then(function () { SW.toast(v > 0 ? 'Budget saved' : 'Budget removed'); }).catch(fail);
+  }
+  function download(name, type, text) {
+    const url = URL.createObjectURL(new Blob([text], { type: type }));
+    const a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+  }
+  function csvCell(v) {
+    let s = String(v == null ? '' : v);
+    if (/^[=+\-@]/.test(s)) s = "'" + s; // stops spreadsheet formula tricks
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  function exportCSV() {
+    if (!state.tx.length) { SW.toast('Nothing to export yet.', true); return; }
+    const lines = ['Date,Title,Type,Category,Payment Method,Amount,Note'];
+    state.tx.forEach(function (t) {
+      lines.push([t.date, csvCell(t.title), t.type, csvCell(t.category), csvCell(t.paymentMethod), t.amount.toFixed(2), csvCell(t.note)].join(','));
+    });
+    download('spendwise-transactions-' + today() + '.csv', 'text/csv;charset=utf-8', String.fromCharCode(0xFEFF) + lines.join('\r\n'));
+    SW.toast('CSV exported (' + state.tx.length + ' rows)');
+  }
+  function strip(t) {
+    return { title: t.title, amount: t.amount, type: t.type, category: t.category, date: t.date,
+      paymentMethod: t.paymentMethod, note: t.note, createdAt: t.createdAt, updatedAt: t.updatedAt };
+  }
+  function backupJSON() {
+    const data = { app: 'SpendWise', version: 1, exportedAt: new Date().toISOString(), budget: state.budget, transactions: state.tx.map(strip) };
+    download('spendwise-backup-' + today() + '.json', 'application/json', JSON.stringify(data, null, 2));
+    SW.toast('Backup saved');
+  }
+  function onRestoreFile(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onerror = function () { SW.toast('Could not read that file.', true); };
+    reader.onload = function () {
+      ev.target.value = '';
+      let data;
+      try { data = JSON.parse(reader.result); } catch (e) { SW.toast('That file is not valid JSON.', true); return; }
+      if (!data || data.app !== 'SpendWise' || !Array.isArray(data.transactions)) {
+        SW.toast('This is not a SpendWise backup file.', true); return;
+      }
+      const good = data.transactions.filter(function (t) { return db.validateTransaction(t).ok; });
+      const skipped = data.transactions.length - good.length;
+      ask('Restore backup?', 'This replaces ALL current data with ' + good.length + ' transaction(s)' +
+        (skipped ? ' (' + skipped + ' invalid skipped)' : '') + '.', 'Restore').then(function (ok) {
+        if (!ok) return;
+        const b = Number(data.budget);
+        return db.replaceAllTransactions(good)
+          .then(function () { return db.setSetting('budget', isFinite(b) && b > 0 ? U.roundMoney(b) : 0); })
+          .then(refresh).then(function () { SW.toast('Backup restored'); });
+      }).catch(fail);
+    };
+    reader.readAsText(file);
+  }
+
+  /* Sample data: realistic student transactions, dated relative to today */
+  const SAMPLE = [
+    [0, 'Canteen lunch', 120, 'expense', 'Food', 'UPI'], [0, 'Metro card recharge', 200, 'expense', 'Transport', 'Card'],
+    [-1, 'Notebooks and pens', 340, 'expense', 'Education', 'Cash'], [-2, 'Movie night', 450, 'expense', 'Entertainment', 'UPI'],
+    [-3, 'Medicines', 260, 'expense', 'Health', 'Cash'], [-4, 'Freelance logo design', 3500, 'income', 'Freelance', 'Bank Transfer'],
+    [-6, 'Mobile recharge', 299, 'expense', 'Bills', 'UPI'], [-8, 'Groceries', 780, 'expense', 'Food', 'UPI'],
+    [-10, 'Online course', 1499, 'expense', 'Education', 'Card'], [-12, 'Scholarship instalment', 6000, 'income', 'Scholarship', 'Bank Transfer'],
+    [-15, 'Hostel rent', 4500, 'expense', 'Rent', 'Bank Transfer'], [-18, 'Sneakers', 1899, 'expense', 'Shopping', 'Card'],
+    [-24, 'Pocket money', 2000, 'income', 'Gift', 'Cash'], [-33, 'Hostel rent', 4500, 'expense', 'Rent', 'Bank Transfer'],
+    [-36, 'Dinner with friends', 640, 'expense', 'Food', 'UPI'], [-40, 'Part-time salary', 5000, 'income', 'Salary', 'Bank Transfer']
+  ];
+  function loadSample() {
+    Promise.all(SAMPLE.map(function (s) {
+      return db.addTransaction({ title: s[1], amount: s[2], type: s[3], category: s[4], date: offsetDate(s[0]), paymentMethod: s[5], note: SAMPLE_NOTE });
+    })).then(function () { return state.budget ? null : db.setSetting('budget', 12000); })
+      .then(refresh).then(function () { SW.toast('Sample data loaded'); SW.go('home'); }).catch(fail);
+  }
+  function removeSample() {
+    ask('Remove sample data?', 'Only the sample transactions are deleted. Your own entries stay.', 'Remove').then(function (ok) {
+      if (!ok) return;
+      const keep = state.tx.filter(function (t) { return t.note !== SAMPLE_NOTE; }).map(strip);
+      return db.replaceAllTransactions(keep).then(refresh).then(function () { SW.toast('Sample data removed'); });
+    }).catch(fail);
+  }
+  function clearAll() {
+    ask('Clear all data?', 'Every transaction and your budget will be deleted permanently. Export a backup first if unsure.', 'Clear all')
+      .then(function (ok) {
+        if (!ok) return;
+        return db.replaceAllTransactions([]).then(function () { return db.setSetting('budget', 0); })
+          .then(refresh).then(function () { SW.toast('All data cleared'); });
+      }).catch(fail);
+  }
+
+  /* ---------- Click handler for buttons created by the screens ---------- */
+  function onAction(e) {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.dataset.act, id = Number(b.dataset.id);
+    if (act === 'edit') startEdit(id);
+    else if (act === 'delete') askDelete(id);
+    else if (act === 'sample') loadSample();
+    else if (act === 'goto-add') SW.go('add');
+  }
+
+  const DRAW = { home: renderHome, history: renderHistory, add: renderAdd, analytics: renderAnalytics, settings: renderSettings };
+  Object.keys(DRAW).forEach(function (name) {
+    SW.views[name] = { render: function () { reload().then(DRAW[name]).catch(fail); } };
+  });
+
+  /* ---------- Start-up: connect buttons and load data ---------- */
+  document.addEventListener('DOMContentLoaded', function () {
+    const cats = EXP.concat(INC.filter(function (c) { return EXP.indexOf(c) === -1; }));
+    $('f-cat').innerHTML = '<option value="">All categories</option>' + cats.map(function (c) { return '<option>' + c + '</option>'; }).join('');
+    $('an-month').value = monthOf(today());
+
+    $('tx-form').addEventListener('submit', onSubmit);
+    document.querySelectorAll('input[name="type"]').forEach(function (r) {
+      r.addEventListener('change', function () { fillCategories(); });
+    });
+    $('a-cancel').addEventListener('click', function () { resetForm(); SW.go('history'); });
+    ['f-search', 'f-type', 'f-cat', 'f-from', 'f-to'].forEach(function (id) {
+      $(id).addEventListener('input', renderHistory);
+      // The search box also fires "change" when you tap away. That would redraw the list
+      // under your finger and swallow the tap on Edit/Delete, so only the others listen.
+      if (id !== 'f-search') $(id).addEventListener('change', renderHistory);
+    });
+    $('f-clear').addEventListener('click', function () {
+      ['f-search', 'f-type', 'f-cat', 'f-from', 'f-to'].forEach(function (id) { $(id).value = ''; });
+      renderHistory();
+    });
+    $('an-month').addEventListener('change', renderAnalytics);
+    $('b-save').addEventListener('click', saveBudget);
+    $('btn-csv').addEventListener('click', exportCSV);
+    $('btn-backup').addEventListener('click', backupJSON);
+    $('btn-restore').addEventListener('click', function () { $('file-restore').click(); });
+    $('file-restore').addEventListener('change', onRestoreFile);
+    $('btn-sample').addEventListener('click', loadSample);
+    $('btn-unsample').addEventListener('click', removeSample);
+    $('btn-clear').addEventListener('click', clearAll);
+    document.addEventListener('click', onAction);
+
+    resetForm();
+    reload().then(function () { DRAW[activeRoute()](); }).catch(fail);
+  });
+})();
+  </script>
+
+  <!-- PART 5 of 5 - app.js: navigation, toast, starts the database -->
+  <script>
+/* ==========================================================
+   SpendWise – app.js
+   Handles: screen navigation (router), the toast message and
+   opening the database when the app starts.
+   Every other file (db.js, add.js, home.js ...) will plug into
+   the global "SpendWise" object defined here.
+   ========================================================== */
+(function () {
+  'use strict';
+
+  // One shared object that all files use to talk to each other.
+  const SpendWise = (window.SpendWise = window.SpendWise || {});
+
+  // Later stages register their screen like this:
+  //   SpendWise.views.home = { render: function () { ... } };
+  // app.js calls render() every time that screen is opened.
+  SpendWise.views = SpendWise.views || {};
+
+  const ROUTES = ['home', 'history', 'add', 'analytics', 'settings'];
+  const DEFAULT_ROUTE = 'home';
+
+  /* ---------- Toast (small pop-up message) ---------- */
+  let toastTimer = null;
+
+  SpendWise.toast = function (message, isError) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.toggle('is-error', Boolean(isError));
+    el.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      el.classList.remove('is-visible');
+    }, 2600);
+  };
+
+  /* ---------- Router ---------- */
+  // The address bar looks like  index.html#history  – the part after # is the route.
+  function getRoute() {
+    const name = window.location.hash.replace('#', '').split('?')[0];
+    return ROUTES.indexOf(name) !== -1 ? name : DEFAULT_ROUTE;
+  }
+
+  function showRoute(route) {
+    // 1. Show only the matching screen
+    ROUTES.forEach(function (name) {
+      const section = document.getElementById('view-' + name);
+      if (!section) return;
+      const isActive = name === route;
+      section.hidden = !isActive;
+      section.classList.remove('is-entering');
+      if (isActive) {
+        // Force the browser to restart the fade-in animation
+        void section.offsetWidth;
+        section.classList.add('is-entering');
+      }
+    });
+
+    // 2. Highlight the matching navigation button
+    document.querySelectorAll('.nav-item').forEach(function (link) {
+      if (link.dataset.route === route) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+
+    // 3. Update the page heading
+    const active = document.getElementById('view-' + route);
+    document.getElementById('topbar-title').textContent = active.dataset.title;
+    document.getElementById('topbar-sub').textContent = active.dataset.sub;
+    document.title = active.dataset.title + ' · SpendWise';
+
+    // 4. Start at the top of the screen
+    window.scrollTo(0, 0);
+
+    // 5. Let the screen refresh its own content (if it has a render function)
+    const view = SpendWise.views[route];
+    if (view && typeof view.render === 'function') {
+      try {
+        view.render();
+      } catch (err) {
+        console.error('Error while showing "' + route + '":', err);
+        SpendWise.toast('Something went wrong loading this screen.', true);
+      }
+    }
+  }
+
+  // Lets other files jump to a screen:  SpendWise.go('history')
+  SpendWise.go = function (route) {
+    if (ROUTES.indexOf(route) === -1) return;
+    if (getRoute() === route) {
+      showRoute(route);          // already there: just refresh it
+    } else {
+      window.location.hash = route;   // triggers "hashchange" below
+    }
+  };
+
+  window.addEventListener('hashchange', function () {
+    showRoute(getRoute());
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Open (or create) the database as soon as the app starts.
+    // Other screens can wait for it with:  SpendWise.dbReady.then(...)
+    SpendWise.dbReady = SpendWise.db
+      ? SpendWise.db.init()
+      : Promise.reject(new Error('db.js did not load.'));
+    SpendWise.dbReady.catch(function (err) {
+      SpendWise.toast(err.message, true);
+    });
+
+    showRoute(getRoute());
+  });
+})();
+  </script>
+
+  <!-- PWA: registers the service worker so the app works offline (needs https or localhost) -->
+  <script>
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').catch(function (err) {
+          console.warn('Offline mode could not start:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
